@@ -1,8 +1,8 @@
 #pragma once
 #include "PokerHandChecker.h"
 
-class FiveOfAKindChecker : public PokerHandChecker{
+class StraightChecker : public PokerHandChecker{
 public:
     bool check(const Hand& hand) override;
-    bool isFiveOfAKind(const Hand& hand);
+    bool isStraight(const Hand& hand);
 };
