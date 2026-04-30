@@ -3,6 +3,5 @@
 
 class FiveOfAKindChecker : public PokerHandChecker{
 public:
-    bool check(const Hand& hand) override;
-    bool isFiveOfAKind(const Hand& hand);
+    HandRank check(const Hand& hand) override;
 };

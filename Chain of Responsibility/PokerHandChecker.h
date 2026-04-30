@@ -20,8 +20,8 @@ enum class HandRank
 
 class PokerHandChecker{
 public:
-    virtual bool check(const Hand& hand) = 0;
+    virtual HandRank check(const Hand& hand) = 0;
     void setNext(PokerHandChecker* next);
-    protected:
+protected:
     PokerHandChecker* nextChecker = nullptr;
 };
