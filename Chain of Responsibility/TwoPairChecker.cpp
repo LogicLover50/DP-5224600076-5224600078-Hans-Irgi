@@ -1,16 +1,25 @@
 #include <iostream>
+#include <map>
 #include "TwoPairChecker.h"
 
-bool isTwoPair(const Hand& hand)
+static bool isTwoPair(const Hand& hand)
 {
-    return hand.value == 11;
+    std::map<int,int> freq;
+    for (const auto& c : hand.cards)
+        freq[c.rank]++;
+
+    int pairs = 0;
+    for (const auto& [rank, cnt] : freq)
+        if (cnt == 2) pairs++;
+
+    return pairs == 2;
 }
 
 HandRank TwoPairChecker::check(const Hand& hand)
 {
     if (isTwoPair(hand))
     {
-        std::cout << "Detected TWOPAIR\n";
+        std::cout << "Detected TWO PAIR\n";
         return HandRank::TWO_PAIR;
     }
 

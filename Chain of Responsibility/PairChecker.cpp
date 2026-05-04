@@ -1,9 +1,18 @@
 #include <iostream>
+#include <map>
 #include "PairChecker.h"
 
-bool isPair(const Hand& hand)
+static bool isPair(const Hand& hand)
 {
-    return hand.value == 2;
+    std::map<int,int> freq;
+    for (const auto& c : hand.cards)
+        freq[c.rank]++;
+
+    int pairs = 0;
+    for (const auto& [rank, cnt] : freq)
+        if (cnt >= 2) pairs++;
+
+    return pairs == 1;
 }
 
 HandRank PairChecker::check(const Hand& hand)

@@ -1,9 +1,17 @@
 #include <iostream>
+#include <map>
 #include "ThreeOfAKindChecker.h"
 
-bool isThreeOfAKind(const Hand& hand)
+static bool isThreeOfAKind(const Hand& hand)
 {
-    return hand.value == 11;
+    std::map<int,int> freq;
+    for (const auto& c : hand.cards)
+        freq[c.rank]++;
+
+    for (const auto& [rank, cnt] : freq)
+        if (cnt == 3) return true;
+
+    return false;
 }
 
 HandRank ThreeOfAKindChecker::check(const Hand& hand)

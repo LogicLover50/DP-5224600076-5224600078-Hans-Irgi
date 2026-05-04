@@ -1,9 +1,17 @@
 #include <iostream>
+#include <map>
 #include "FourOfAKindChecker.h"
 
-bool isFourOfAKind(const Hand& hand)
+static bool isFourOfAKind(const Hand& hand)
 {
-    return hand.value == 11;
+    std::map<int,int> freq;
+    for (const auto& c : hand.cards)
+        freq[c.rank]++;
+
+    for (const auto& [rank, cnt] : freq)
+        if (cnt == 4) return true;
+
+    return false;
 }
 
 HandRank FourOfAKindChecker::check(const Hand& hand)

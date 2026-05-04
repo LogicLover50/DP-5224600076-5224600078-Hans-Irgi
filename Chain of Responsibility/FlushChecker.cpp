@@ -1,9 +1,15 @@
 #include <iostream>
 #include "FlushChecker.h"
 
-bool isFlush(const Hand& hand)
+static bool isFlush(const Hand& hand)
 {
-    return hand.value == 6;
+    if (hand.cards.empty()) return false;
+
+    char suit = hand.cards[0].suit;
+    for (const auto& c : hand.cards)
+        if (c.suit != suit) return false;
+
+    return true;
 }
 
 HandRank FlushChecker::check(const Hand& hand)
