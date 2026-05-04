@@ -1,6 +1,8 @@
 #pragma once
+#include "Hand.h"
+#include "ChosenHand.h"
 
-class HandPlayer {
+class HandPlayer{
 public:
-    void playHand();
+    ChosenHand playHand(const Hand& hand);
 };

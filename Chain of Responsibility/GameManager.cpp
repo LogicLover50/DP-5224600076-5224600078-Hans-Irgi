@@ -6,9 +6,9 @@ void GameManager::runSession()
     std::cout << "=== Run Started ===\n";
 
     Hand hand = handGenerator.generateHand();
-    handPlayer.playHand(hand);
+    ChosenHand chosen = handPlayer.playHand(hand);
 
-    int score = scoringRule.scoreHand(hand);
+    int score = scoringRule.scoreHand(chosen.cards);
     bool win = blindRule.checkBlind(score);
     int reward = rewardRule.earnMoney(win, score);
 
