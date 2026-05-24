@@ -44,7 +44,7 @@ int ScoringRule::convertRankToScore(HandRank rank)
     case HandRank::THREE_OF_A_KIND: return 40;
     case HandRank::TWO_PAIR:        return 30;
     case HandRank::PAIR:            return 20;
-    case HandRank::HIGH_CARD:       return 5;
-    default:                        return 5;
+    case HandRank::HIGH_CARD:       return 10;
+    default:                        return 10;
     }
 }
