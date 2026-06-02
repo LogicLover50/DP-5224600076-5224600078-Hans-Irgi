@@ -1,17 +1,40 @@
 #pragma once
+#include <vector>
+#include <memory>
+#include "BlindState.h"
+#include "ConcreteBlinds.h"
 #include "HandGenerator.h"
 #include "HandPlayer.h"
+#include "RewardCommand.h"
 #include "ScoringRule.h"
-#include "BlindRule.h"
-#include "RewardRule.h"
 
-class GameManager{
+class GameManager {
 public:
+    GameManager();
     void runSession();
+
+    void transitionTo(std::unique_ptr<BlindState> newState);
+    void addPendingCommand(std::unique_ptr<RewardCommand> cmd);
+    void triggerCommands(RewardTiming timing);
+
+    void addAnte(int val) { currentAnte += val; }
+    void resetAnteCycle() { currentAnte = 1; }
+    void resetBlindCycle();
+    void addMaxPlays(int val) { remainingPlays += val; }
+    void addRoundScore(int score) { roundScore += score; }
+    int getRoundScore() const { return roundScore; }
+
 private:
+    int currentAnte = 1;
+    int roundScore = 0;
+    int remainingPlays = 4;
+    int remainingDiscards = 4;
+    bool runActive = true;
+
     HandGenerator handGenerator;
     HandPlayer    handPlayer;
-    ScoringRule   scoringRule;
-    BlindRule     blindRule;
-    RewardRule    rewardRule;
+    ScoringRule   scoringRule; 
+
+    std::unique_ptr<BlindState> currentBlind;
+    std::vector<std::unique_ptr<RewardCommand>> pendingCommands;
 };

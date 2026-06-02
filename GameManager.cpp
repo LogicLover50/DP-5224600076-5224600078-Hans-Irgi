@@ -1,17 +1,96 @@
 #include <iostream>
 #include "GameManager.h"
 
+GameManager::GameManager()
+{
+    currentBlind = std::make_unique<SmallBlindState>();
+}
+
+void GameManager::transitionTo(std::unique_ptr<BlindState> newState)
+{
+    currentBlind = std::move(newState);
+}
+
+void GameManager::addPendingCommand(std::unique_ptr<RewardCommand> cmd)
+{
+    pendingCommands.push_back(std::move(cmd));
+}
+
+void GameManager::resetBlindCycle()
+{
+    std::cout << "[SYSTEM] Advanced to the next Ante. Resetting round counters!\n";
+    this->remainingPlays = 4;
+    this->remainingDiscards = 4;
+}
+
+void GameManager::triggerCommands(RewardTiming timing)
+{
+    auto it = pendingCommands.begin();
+    while (it != pendingCommands.end())
+    {
+        if ((*it)->getTiming() == timing)
+        {
+            (*it)->execute(*this);
+            it = pendingCommands.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
 void GameManager::runSession()
 {
     std::cout << "=== Run Started ===\n";
 
-    Hand hand = handGenerator.generateHand();
-    ChosenHand chosen = handPlayer.playHand(hand);
+    while (runActive && currentBlind != nullptr)
+    {
+        std::cout << "\n--------------------------------------------\n";
+        std::cout << "Current Ante: " << currentAnte << "\n";
+        std::cout << "Active Phase: " << currentBlind->getBlindName() << "\n";
+        std::cout << "Target Score Needed: " << currentBlind->getTargetScore() << "\n";
+        std::cout << "--------------------------------------------\n";
 
-    int score = scoringRule.scoreHand(chosen.cards);
-    bool win = blindRule.checkBlind(score);
-    int reward = rewardRule.earnMoney(win, score);
+        std::cout << "Choose Action: [1] PLAY Blind  [2] SKIP Blind: ";
+        int choice;
+        std::cin >> choice;
 
-    std::cout << "Money gained: " << reward << "\n";
+        if (choice == 1)
+        {
+            triggerCommands(RewardTiming::Start);
+
+            roundScore = 0;
+            Hand hand = handGenerator.generateHand();
+            ChosenHand chosen = handPlayer.playHand(hand);
+
+            int score = scoringRule.scoreHand(chosen.cards);
+            addRoundScore(score);
+
+            std::cout << "Hand Score: " << score << " | Total: " << roundScore << "\n";
+
+            if (roundScore >= currentBlind->getTargetScore())
+            {
+                std::cout << "Blind Cleared! Gained $" << currentBlind->getRewardMoney() << "\n";
+                currentBlind->advance(*this);
+            }
+            else
+            {
+                std::cout << "Failed to beat the target score.\n";
+                runActive = false;
+            }
+        } 
+        else if (choice == 2)
+        {
+            std::cout << "Skipping " << currentBlind->getBlindName() << "...\n";
+
+            auto reward = currentBlind->createSkipReward();
+            if (reward) {
+                addPendingCommand(std::move(reward));
+            }
+
+            currentBlind->advance(*this);
+        }
+    }
     std::cout << "=== Run Ended ===\n";
 }

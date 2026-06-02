@@ -8,12 +8,11 @@
             "args": [
                 "-g",
                 "-std=c++17",
-                "BlindRule.cpp",
+                "ConCreteBlinds.cpp",
                 "GameManager.cpp",
                 "HandGenerator.cpp",
                 "HandPlayer.cpp",
                 "PokerHandChecker.cpp",
-                "RewardRule.cpp",
                 "ScoringRule.cpp",
                 "main.cpp",
                 "Hands/FiveOfAKindChecker.cpp",
@@ -37,7 +36,9 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": ["$gcc"],
+            "problemMatcher": [
+                "$gcc"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true

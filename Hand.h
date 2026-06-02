@@ -5,4 +5,5 @@
 struct Hand
 {
     std::vector<Card> cards;
+    void clear() { cards.clear(); }
 };
