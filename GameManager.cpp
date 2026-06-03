@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include "GameManager.h"
+#include "Jokers/BaseScore.h" // Tambahan Header BaseScore
 
 GameManager::GameManager()
 {
@@ -42,10 +43,16 @@ void GameManager::triggerCommands(RewardTiming timing)
     }
 }
 
+// menambah fungsi untuk implementasi joker
+void GameManager::addJoker(std::unique_ptr<IJoker> joker)
+{
+    activeJokers.push_back(std::move(joker));
+}
+
+//runSession diubah untuk bisa memanggil fungsi joker
 void GameManager::runSession()
 {
     std::cout << "=== Run Started ===\n";
-
     while (runActive && currentBlind != nullptr)
     {
         std::cout << "\n--------------------------------------------\n";
@@ -91,7 +98,6 @@ void GameManager::runSession()
         else if (choice == 1)
         {
             triggerCommands(RewardTiming::Start);
-
             roundScore = 0;
             int actualTarget = static_cast<int>(currentBlind->getTargetScore() * targetScoreModifier);
             int playsLeft = remainingPlays;
@@ -136,12 +142,31 @@ void GameManager::runSession()
 
                 if (roundAction == 1)
                 {
-                    int score = scoringRule.scoreHand(chosen.cards);
-                    roundScore += score;
-                    playsLeft--;
+                    // 1. OBSERVER PATTERN: Beritahu Joker kartu baru saja dimainkan
+                    for (auto& joker : activeJokers) {
+                        joker->onHandPlayed(chosen);
+                    }
 
+                    int rawScore = scoringRule.scoreHand(chosen.cards);
+
+                    // 2. DECORATOR PATTERN: Rangkai Joker dari kiri ke kanan
+                    BaseScore baseScore(rawScore);
+                    IScore* finalScoreObj = &baseScore;
+
+                    for (auto& joker : activeJokers) {
+                        joker->setNextScore(finalScoreObj);
+                        finalScoreObj = joker.get(); // Dapatkan raw pointer untuk rantai Decorator
+                    }
+
+                    // Eksekusi total skor
+                    int finalHandScore = finalScoreObj->getScore(chosen);
+                    addRoundScore(finalHandScore);
+
+                    std::cout << "Raw Score: " << rawScore << " | After Jokers: " << finalHandScore
+                        << " | Total Round Score: " << roundScore << "\n";
+
+                    playsLeft--;
                     removeChosenFromHand(chosen);
-                    std::cout << "Played Cards. Scored: " << score << " points! Current Round Total: " << roundScore << "\n";
                 }
                 else if (roundAction == 2)
                 {
@@ -156,20 +181,45 @@ void GameManager::runSession()
                     {
                         std::cout << "Out of discards! Forcing Play Action...\n";
 
-                        int score = scoringRule.scoreHand(chosen.cards);
-                        roundScore += score;
-                        playsLeft--;
+                        // 1. OBSERVER PATTERN: Beritahu Joker kartu baru saja dimainkan
+                        for (auto& joker : activeJokers) {
+                            joker->onHandPlayed(chosen);
+                        }
 
+                        int rawScore = scoringRule.scoreHand(chosen.cards);
+
+                        // 2. DECORATOR PATTERN: Rangkai Joker dari kiri ke kanan
+                        BaseScore baseScore(rawScore);
+                        IScore* finalScoreObj = &baseScore;
+
+                        for (auto& joker : activeJokers) {
+                            joker->setNextScore(finalScoreObj);
+                            finalScoreObj = joker.get(); // Dapatkan raw pointer untuk rantai Decorator
+                        }
+
+                        // Eksekusi total skor
+                        int finalHandScore = finalScoreObj->getScore(chosen);
+                        addRoundScore(finalHandScore);
+
+                        std::cout << "Raw Score: " << rawScore << " | After Jokers: " << finalHandScore
+                            << " | Total Round Score: " << roundScore << "\n";
+
+                        playsLeft--;
                         removeChosenFromHand(chosen);
-                        std::cout << "Scored: " << score << " points! Total Round Score: " << roundScore << "\n";
                     }
                 }
             }
 
             if (roundScore >= actualTarget)
             {
-                std::cout << "\nBlind Cleared! Gained $" << currentBlind->getRewardMoney() << "\n";
+                std::cout << "Blind Cleared! Gained $" << currentBlind->getRewardMoney() << "\n";
+
+                // 3. OBSERVER PATTERN: Beritahu Joker ronde sukses diselesaikan
                 currentMoney += currentBlind->getRewardMoney();
+                for (auto& joker : activeJokers) {
+                    joker->onBlindCleared();
+                }
+
                 currentBlind->advance(*this);
             }
             else

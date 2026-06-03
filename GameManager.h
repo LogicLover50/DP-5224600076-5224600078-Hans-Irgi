@@ -7,6 +7,7 @@
 #include "HandPlayer.h"
 #include "RewardCommand.h"
 #include "ScoringRule.h"
+#include "Jokers/IJoker.h" // Menambah Header Joker
 
 class GameManager {
 public:
@@ -16,6 +17,9 @@ public:
     void transitionTo(std::unique_ptr<BlindState> newState);
     void addPendingCommand(std::unique_ptr<RewardCommand> cmd);
     void triggerCommands(RewardTiming timing);
+
+    // Menambah fungsi untuk Joker
+    void addJoker(std::unique_ptr<IJoker> joker);
 
     void addAnte(int val) { currentAnte += val; }
     void resetAnteCycle() { currentAnte = 1; }
@@ -44,4 +48,7 @@ private:
 
     std::unique_ptr<BlindState> currentBlind;
     std::vector<std::unique_ptr<RewardCommand>> pendingCommands;
+
+    // Inventory Joker
+    std::vector<std::unique_ptr<IJoker>> activeJokers;
 };
