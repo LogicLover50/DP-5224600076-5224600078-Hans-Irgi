@@ -3,7 +3,8 @@
 #include <set>
 #include "HandPlayer.h"
 
-static const std::string rankNames[] = {
+static const std::string rankNames[] =
+{
     "","","2","3","4","5","6","7","8","9","10","J","Q","K","A"
 };
 
@@ -13,8 +14,7 @@ static void printHand(const Hand& hand)
     for (int i = 0; i < (int)hand.cards.size(); ++i)
     {
         const auto& card = hand.cards[i];
-        std::cout << "  [" << i << "] "
-                  << rankNames[card.rank] << card.suit << "\n";
+        std::cout << "  [" << i << "] " << rankNames[card.rank] << card.suit << "\n";
     }
     std::cout << "\n";
 }
@@ -30,7 +30,7 @@ ChosenHand HandPlayer::playHand(const Hand& hand)
         std::cout << "Enter up to 5 card indices (0-7) separated by spaces: ";
 
         std::string line;
-        std::getline(std::cin >> std::ws, line);  // std::ws skips any leftover newline
+        std::getline(std::cin >> std::ws, line);
 
         std::istringstream ss(line);
         std::set<int> parsed;
@@ -49,17 +49,16 @@ ChosenHand HandPlayer::playHand(const Hand& hand)
             }
             if (parsed.count(token))
             {
-                std::cout << "Duplicate index " << token << ". Each card can only be picked once.\n";
+                std::cout << "Duplicate index " << token << ".\n";
                 valid = false;
                 break;
             }
             parsed.insert(token);
         }
 
-        // Check for non-numeric tokens by seeing if the stream failed mid-parse
         if (!ss.eof() && ss.fail())
         {
-            std::cout << "Invalid input. Please enter numbers only.\n";
+            std::cout << "Please enter numbers only.\n";
             continue;
         }
 
@@ -67,13 +66,13 @@ ChosenHand HandPlayer::playHand(const Hand& hand)
 
         if (parsed.empty())
         {
-            std::cout << "Please select at least 1 card.\n";
+            std::cout << "Please select at least 1 Card.\n";
             continue;
         }
 
         if (parsed.size() > 5)
         {
-            std::cout << "Too many cards selected. Please choose at most 5.\n";
+            std::cout << "Please choose at most 5 Cards.\n";
             continue;
         }
 

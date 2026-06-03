@@ -1,8 +1,8 @@
 #include "ConcreteBlinds.h"
-#include "GameManager.h"
 #include "ConcreteCommands.h"
+#include "GameManager.h"
 
-// === Small Blind Implementation ===
+// === Small Blind ===
 std::string SmallBlindState::getBlindName() const { return "Small Blind"; }
 int SmallBlindState::getTargetScore() const { return 300; }
 int SmallBlindState::getRewardMoney() const { return 3; }
@@ -14,10 +14,10 @@ void SmallBlindState::advance(GameManager& game)
 
 std::unique_ptr<RewardCommand> SmallBlindState::createSkipReward()
 {
-    return std::make_unique<BonusHandCommand>(RewardTiming::NextBlind);
+    return std::make_unique<DoubleMoneyCommand>(RewardTiming::Start);
 }
 
-// === Big Blind Implementation ===
+// === Big Blind ===
 std::string BigBlindState::getBlindName() const { return "Big Blind"; }
 int BigBlindState::getTargetScore() const { return 450; }
 int BigBlindState::getRewardMoney() const { return 4; }
@@ -29,10 +29,10 @@ void BigBlindState::advance(GameManager& game)
 
 std::unique_ptr<RewardCommand> BigBlindState::createSkipReward()
 {
-    return std::make_unique<FreePlayingCardCommand>(RewardTiming::Start);
+    return std::make_unique<HalfTargetScoreCommand>(RewardTiming::Start);
 }
 
-// === Boss Blind Implementation ===
+// === Boss Blind ===
 std::string BossBlindState::getBlindName() const { return "Boss Blind"; }
 int BossBlindState::getTargetScore() const { return 800; }
 int BossBlindState::getRewardMoney() const { return 5; }
@@ -46,5 +46,5 @@ void BossBlindState::advance(GameManager& game)
 
 std::unique_ptr<RewardCommand> BossBlindState::createSkipReward()
 {
-    return std::make_unique<BonusHandCommand>(RewardTiming::NextAnte);
+    return std::make_unique<BonusStatsCommand>(RewardTiming::NextAnte);
 }
