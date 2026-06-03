@@ -28,12 +28,19 @@ public:
     void addRoundScore(int score) { roundScore += score; }
     int getRoundScore() const { return roundScore; }
 
+    void doubleCurrentMoney() { currentMoney *= 2; }
+    void applyHalfTargetModifier() { targetScoreModifier = 0.5f; }
+    void addDiscards(int val) { remainingDiscards += val; }
+
 private:
     int currentAnte = 1;
     int roundScore = 0;
     int remainingPlays = 4;
     int remainingDiscards = 4;
     bool runActive = true;
+
+    int currentMoney = 4;
+    float targetScoreModifier = 1.0f;
 
     HandGenerator handGenerator;
     HandPlayer    handPlayer;

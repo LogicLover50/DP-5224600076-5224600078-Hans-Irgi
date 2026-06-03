@@ -3,22 +3,31 @@
 #include <random>
 #include "HandGenerator.h"
 
-Hand HandGenerator::generateHand()
+HandGenerator::HandGenerator() : rng(std::random_device{}())
 {
-    std::cout << "Generating hand...\n";
+    std::cout << "Generating Hand...\n";
 
-    std::vector<Card> deck;
     const char suits[] = {'H', 'D', 'C', 'S'};
     for (char suit : suits)
         for (int rank = 2; rank <= 14; ++rank)
-            deck.push_back({rank, suit});
+            fullDeck.push_back({rank, suit});
+}
 
-    std::mt19937 rng(std::random_device{}());
-    std::shuffle(deck.begin(), deck.end(), rng);
+void HandGenerator::resetDeckForRound()
+{
+    std::cout << "Shuffling Deck...\n";
 
-    Hand hand;
-    for (int i = 0; i < 8; ++i)
-        hand.cards.push_back(deck[i]);
+    currentRoundDeck = fullDeck;
+    std::shuffle(currentRoundDeck.begin(), currentRoundDeck.end(), rng);
+}
 
-    return hand;
+void HandGenerator::replenishHand(Hand& currentHand)
+{
+    std::cout << "Drawing Hand...\n";
+
+    while (currentHand.cards.size() < 8 && !currentRoundDeck.empty())
+    {
+        currentHand.cards.push_back(currentRoundDeck.back());
+        currentRoundDeck.pop_back();
+    }
 }

@@ -8,6 +8,7 @@ public:
     std::string getBlindName() const override;
     int getTargetScore() const override;
     int getRewardMoney() const override;
+
     void advance(GameManager& game) override;
     std::unique_ptr<RewardCommand> createSkipReward() override;
 };
@@ -17,6 +18,7 @@ public:
     std::string getBlindName() const override;
     int getTargetScore() const override;
     int getRewardMoney() const override;
+
     void advance(GameManager& game) override;
     std::unique_ptr<RewardCommand> createSkipReward() override;
 };
@@ -26,6 +28,8 @@ public:
     std::string getBlindName() const override;
     int getTargetScore() const override;
     int getRewardMoney() const override;
+    bool isSkippable() const override { return false; }
+
     void advance(GameManager& game) override;
     std::unique_ptr<RewardCommand> createSkipReward() override;
 };
